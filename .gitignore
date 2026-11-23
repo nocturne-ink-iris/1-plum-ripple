@@ -1,0 +1,6 @@
+# Референсы из Pinterest (не нужно тащить в репо)
+assets/theme-vibes/
+
+# Системный мусор
+.DS_Store
+Thumbs.db

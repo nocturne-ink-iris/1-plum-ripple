@@ -1,0 +1,285 @@
+/* ==========================================================================
+   My Theme 1 — Plum Ripple (VN-inspired, Zero-Lag Edition)
+   База: чистый CSS без backdrop-filter, border-image и JS-наблюдателей.
+   ========================================================================== */
+
+:root {
+    /* --- 1. Твоя палитра --- */
+    --plum-base: #673a69;
+    --plum-accent: #9a579e;
+    --plum-pastel: #b78ab3;
+
+    /* Производные тёмные оттенки для читаемого контраста ночью */
+    --plum-deep: #211223;
+    --plum-surface: #301a33;
+    --plum-user-surface: #3d2140;
+    --plum-panel: #29162b;
+
+    /* Текст и акценты */
+    --plum-text: #f3eaf2;
+    --plum-text-muted: #c6a9c4;
+    --plum-quote: #f4cbe1;
+    --plum-underline: #e3b5db;
+    --plum-border: rgba(183, 138, 179, 0.38);
+    --plum-border-strong: rgba(183, 138, 179, 0.72);
+
+    /* Настройки портретной аватарки Ripple (2:3) */
+    --ripple-avatar-width: 165px;
+    --ripple-avatar-mobile-width: 96px;
+    --ripple-avatar-ratio: 1.5;
+
+    /* Переопределяем системные переменные SillyTavern */
+    --SmartThemeBodyColor: var(--plum-text);
+    --SmartThemeEmColor: var(--plum-text-muted);
+    --SmartThemeQuoteColor: var(--plum-quote);
+    --SmartThemeUnderlineColor: var(--plum-underline);
+    --SmartThemeBlurTintColor: var(--plum-panel);
+    --SmartThemeChatTintColor: rgba(33, 18, 35, 0.88);
+    --SmartThemeUserMesBlurTintColor: var(--plum-user-surface);
+    --SmartThemeBotMesBlurTintColor: var(--plum-surface);
+    --SmartThemeBorderColor: var(--plum-border);
+    --SmartThemeShadowColor: rgba(14, 6, 16, 0.55);
+    --SmartThemeBlurStrength: 0px;
+}
+
+/* ==========================================================================
+   2. Верхняя панель и общие поверхности (статичный градиент без blur)
+   ========================================================================== */
+
+#top-bar,
+#top-settings-holder {
+    background: linear-gradient(90deg, var(--plum-deep) 0%, var(--plum-base) 100%) !important;
+    border-bottom: 1px solid var(--plum-border) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.drawer-content,
+#left-nav-panel,
+#right-nav-panel,
+.popup {
+    background: linear-gradient(180deg, var(--plum-panel) 0%, var(--plum-deep) 100%) !important;
+    border: 1px solid var(--plum-border) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Убираем тяжёлый blur с общего контейнера чата */
+#sheld {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Аккуратный скроллбар */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--plum-deep);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--plum-base);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--plum-accent);
+}
+
+/* ==========================================================================
+   3. Стиль чата Ripple + рамка в духе диалогового окна VN
+   ========================================================================== */
+
+#chat .mes {
+    background: linear-gradient(160deg, var(--plum-surface) 0%, var(--plum-deep) 100%) !important;
+    border: 1px solid var(--plum-border) !important;
+    /* Тонкая вторая внутренняя каёмка (без размытых теней = ноль лагов) */
+    box-shadow: inset 0 0 0 1px rgba(154, 87, 158, 0.18) !important;
+    border-radius: 14px !important;
+    padding: 0 14px 12px 0 !important;
+    margin: 10px 0 !important;
+    overflow: visible;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#chat .mes[is_user="true"] {
+    background: linear-gradient(160deg, var(--plum-user-surface) 0%, #2a162c 100%) !important;
+    border-color: rgba(154, 87, 158, 0.5) !important;
+}
+
+/* Липкая контейнер-обёртка аватарки */
+#chat .mes .mesAvatarWrapper {
+    position: sticky;
+    top: 8px;
+    padding: 0 10px 24px 0 !important;
+    flex-shrink: 0;
+}
+
+/* Портретная аватарка 2:3 */
+#chat .mes .mesAvatarWrapper .avatar {
+    width: var(--ripple-avatar-width) !important;
+    height: calc(var(--ripple-avatar-width) * var(--ripple-avatar-ratio)) !important;
+    min-width: var(--ripple-avatar-width) !important;
+    min-height: calc(var(--ripple-avatar-width) * var(--ripple-avatar-ratio)) !important;
+    aspect-ratio: 2 / 3;
+    border: none !important;
+    border-radius: 13px 0 0 0 !important;
+    margin: 0 !important;
+    overflow: hidden;
+    flex: unset !important;
+    background: transparent !important;
+}
+
+#chat .mes .mesAvatarWrapper .avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: top center !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 13px 0 0 0 !important;
+
+    /* Мягкое растворение правого и нижнего края в карточку */
+    -webkit-mask-image:
+        linear-gradient(to left, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 28%),
+        linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 36%);
+    mask-image:
+        linear-gradient(to left, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 28%),
+        linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 36%);
+    -webkit-mask-composite: destination-in;
+    mask-composite: intersect;
+}
+
+/* Если пользователь скрыл аватарки в настройках ST — не оставляем пустую дыру */
+body.hideChatAvatars #chat .mes {
+    padding: 12px 16px !important;
+}
+
+/* Системные сообщения и маленькие уведомления */
+#chat .mes[is_system="true"],
+#chat .mes.smallSysMes {
+    padding: 10px 14px !important;
+    background: rgba(33, 18, 35, 0.78) !important;
+    border-style: dashed !important;
+}
+
+/* ==========================================================================
+   4. Блок текста и VN-бейдж имени персонажа
+   ========================================================================== */
+
+#chat .mes .mes_block {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 14px 4px 4px 4px !important;
+    min-width: 0;
+}
+
+#chat .mes .mes_block .ch_name {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--plum-border);
+}
+
+#chat .mes .mes_block .name_text {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--plum-accent) 0%, var(--plum-base) 100%);
+    border: 1px solid var(--plum-border-strong);
+    color: var(--plum-text);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+#chat .mes[is_user="true"] .mes_block .name_text {
+    background: linear-gradient(90deg, var(--plum-base) 0%, #4d2b4f 100%);
+    border-color: var(--plum-border);
+}
+
+#chat .mes .mes_text {
+    line-height: 1.62;
+}
+
+/* Цитаты и курсив */
+#chat .mes .mes_text q {
+    color: var(--plum-quote);
+}
+
+#chat .mes .mes_text em {
+    color: var(--plum-text-muted);
+}
+
+/* Кнопки действий у сообщения — делаем аккуратнее */
+#chat .mes .mes_buttons,
+#chat .mes .extraMesButtons {
+    opacity: 0.65;
+    transition: opacity 0.15s ease;
+}
+
+#chat .mes:hover .mes_buttons,
+#chat .mes:hover .extraMesButtons {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   5. Поле ввода, кнопки и интерактивные элементы
+   ========================================================================== */
+
+#send_form {
+    background: linear-gradient(180deg, var(--plum-surface) 0%, var(--plum-deep) 100%) !important;
+    border: 1px solid var(--plum-border) !important;
+    border-radius: 14px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+#send_form:has(#send_textarea:focus-visible) {
+    border-color: var(--plum-pastel) !important;
+}
+
+#send_textarea {
+    color: var(--plum-text) !important;
+}
+
+#send_textarea::placeholder {
+    color: var(--plum-text-muted) !important;
+    opacity: 0.65;
+}
+
+.menu_button,
+#send_but,
+#options_button {
+    border: 1px solid var(--plum-border) !important;
+    background-color: rgba(103, 58, 105, 0.35) !important;
+    color: var(--plum-text) !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.menu_button:hover,
+#send_but:hover,
+#options_button:hover {
+    background-color: var(--plum-accent) !important;
+    border-color: var(--plum-pastel) !important;
+}
+
+/* ==========================================================================
+   6. Мобильная адаптация для Ripple-аватарки
+   ========================================================================== */
+
+@media screen and (max-width: 1000px) {
+    #chat .mes .mesAvatarWrapper .avatar {
+        width: var(--ripple-avatar-mobile-width) !important;
+        height: calc(var(--ripple-avatar-mobile-width) * var(--ripple-avatar-ratio)) !important;
+        min-width: var(--ripple-avatar-mobile-width) !important;
+        min-height: calc(var(--ripple-avatar-mobile-width) * var(--ripple-avatar-ratio)) !important;
+    }
+}
