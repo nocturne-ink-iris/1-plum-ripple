@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Neucha&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Neucha&family=Nunito:wght@400;600;700&family=Pangolin&family=Rubik:wght@400;500;700&display=swap');
 
 /* ==========================================================================
    My Theme 1 — Plum Ripple (VN-inspired, Zero-Lag Edition)
@@ -43,13 +43,17 @@
     --SmartThemeBorderColor: var(--plum-border);
     --SmartThemeShadowColor: rgba(14, 6, 16, 0.55);
     --SmartThemeBlurStrength: 0px;
-    --mainFontFamily: 'Neucha', sans-serif;
+
+    /* Управляется из настроек расширения (index.js) */
+    --theme-font: 'Neucha', sans-serif;
+    --theme-font-size: 1.30em;
+    --mainFontFamily: var(--theme-font);
 }
 
 body,
 #chat .mes .mes_text,
 #send_textarea {
-    font-family: 'Neucha', sans-serif;
+    font-family: var(--theme-font);
 }
 
 /* ==========================================================================
@@ -211,7 +215,7 @@ body.hideChatAvatars #chat .mes {
 }
 
 #chat .mes .mes_text {
-    font-size: 1.30em;
+    font-size: var(--theme-font-size);
     line-height: 1.62;
 }
 
