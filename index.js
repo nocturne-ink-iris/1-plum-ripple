@@ -3,6 +3,7 @@ import { saveSettingsDebounced } from '../../../../script.js';
 
 const MODULE_NAME = 'plum_ripple_theme';
 const CUSTOM_GFONT_LINK_ID = 'plum-custom-gfont';
+const BG_LAYER_ID = 'plum-theme-bg';
 
 const FONT_PRESETS = {
     neucha: { label: 'Neucha (рукописный)', family: "'Neucha', sans-serif" },
@@ -14,10 +15,36 @@ const FONT_PRESETS = {
     custom: { label: 'Свой шрифт...', family: '' },
 };
 
+const BG_PRESETS = {
+    pastel_mountains: {
+        label: 'Pastel Mountains (пиксель-арт)',
+        type: 'image',
+        value: new URL("./assets/bg's/Gemini_Generated_Image_ogsft0ogsft0ogsf.jpg", import.meta.url).href,
+    },
+    y2k_glitch: {
+        label: 'Y2K Glitch (рабочий стол)',
+        type: 'image',
+        value: new URL("./assets/bg's/Gemini_Generated_Image_sumatesumatesuma.jpg", import.meta.url).href,
+    },
+    plum_gradient: {
+        label: 'Сливовый градиент',
+        type: 'gradient',
+        value: 'radial-gradient(circle at 20% 20%, #673a69 0%, #2b152d 55%, #180d19 100%)',
+    },
+    tavern: {
+        label: 'Фон Таверны (прозрачный)',
+        type: 'tavern',
+        value: '',
+    },
+};
+
 const DEFAULT_SETTINGS = {
     fontPreset: 'neucha',
     customFont: '',
     fontSize: 1.30,
+    bgPreset: 'pastel_mountains',
+    bgDim: 45,
+    bgBlur: 0,
 };
 
 /** @type {ReturnType<typeof setTimeout> | null} */
@@ -67,6 +94,42 @@ function loadGoogleFont(fontName) {
     document.head.appendChild(link);
 }
 
+function ensureBgLayer() {
+    let layer = document.getElementById(BG_LAYER_ID);
+    if (!layer) {
+        layer = document.createElement('div');
+        layer.id = BG_LAYER_ID;
+        document.body.prepend(layer);
+    }
+    return layer;
+}
+
+function applyBackgroundSettings() {
+    const settings = getSettings();
+    const layer = ensureBgLayer();
+    const presetKey = settings.bgPreset in BG_PRESETS
+        ? /** @type {keyof typeof BG_PRESETS} */ (settings.bgPreset)
+        : 'pastel_mountains';
+    const preset = BG_PRESETS[presetKey];
+
+    // Затемнение и размытие применяем к картинке и градиенту
+    const dimRatio = Math.min(0.9, Math.max(0, Number(settings.bgDim) / 100));
+    const blurPx = Math.min(10, Math.max(0, Number(settings.bgBlur)));
+    document.documentElement.style.setProperty('--theme-bg-dim', String(dimRatio));
+    document.documentElement.style.setProperty('--theme-bg-blur', `${blurPx}px`);
+
+    if (preset.type === 'tavern') {
+        layer.style.display = 'none';
+        layer.style.backgroundImage = '';
+        layer.style.backgroundColor = '';
+        return;
+    }
+
+    layer.style.display = 'block';
+    layer.style.backgroundColor = '#180d19';
+    layer.style.backgroundImage = preset.type === 'image' ? `url("${preset.value}")` : preset.value;
+}
+
 function applyThemeSettings() {
     const settings = getSettings();
     const root = document.documentElement;
@@ -83,6 +146,8 @@ function applyThemeSettings() {
 
     root.style.setProperty('--theme-font', fontFamily);
     root.style.setProperty('--theme-font-size', `${settings.fontSize}em`);
+
+    applyBackgroundSettings();
 }
 
 function renderSettingsUI() {
@@ -92,8 +157,12 @@ function renderSettingsUI() {
     }
 
     const settings = getSettings();
-    const optionsHtml = Object.entries(FONT_PRESETS)
+    const fontOptionsHtml = Object.entries(FONT_PRESETS)
         .map(([key, { label }]) => `<option value="${key}" ${settings.fontPreset === key ? 'selected' : ''}>${label}</option>`)
+        .join('');
+
+    const bgOptionsHtml = Object.entries(BG_PRESETS)
+        .map(([key, { label }]) => `<option value="${key}" ${settings.bgPreset === key ? 'selected' : ''}>${label}</option>`)
         .join('');
 
     const wrapper = document.createElement('div');
@@ -107,8 +176,23 @@ function renderSettingsUI() {
             </div>
             <div class="inline-drawer-content">
                 <div class="flex-container flexFlowColumn" style="gap: 8px; padding: 6px 0;">
+                    <label for="plum-bg-select">Фон темы</label>
+                    <select id="plum-bg-select" class="text_pole">${bgOptionsHtml}</select>
+
+                    <label for="plum-bg-dim-range">
+                        Затемнение фона: <span id="plum-bg-dim-val">${settings.bgDim}</span>%
+                    </label>
+                    <input id="plum-bg-dim-range" type="range" min="0" max="90" step="5" value="${settings.bgDim}">
+
+                    <label for="plum-bg-blur-range">
+                        Размытие фона: <span id="plum-bg-blur-val">${settings.bgBlur}</span>px
+                    </label>
+                    <input id="plum-bg-blur-range" type="range" min="0" max="10" step="1" value="${settings.bgBlur}">
+
+                    <hr style="width: 100%; opacity: 0.2; margin: 4px 0;">
+
                     <label for="plum-font-select">Шрифт интерфейса и чата</label>
-                    <select id="plum-font-select" class="text_pole">${optionsHtml}</select>
+                    <select id="plum-font-select" class="text_pole">${fontOptionsHtml}</select>
 
                     <div id="plum-custom-font-wrap" style="display: ${settings.fontPreset === 'custom' ? 'block' : 'none'};">
                         <label for="plum-custom-font-input">Название шрифта (с Google Fonts или из системы)</label>
@@ -126,6 +210,12 @@ function renderSettingsUI() {
 
     container.appendChild(wrapper);
 
+    const bgSelect = /** @type {HTMLSelectElement | null} */ (document.getElementById('plum-bg-select'));
+    const bgDimRange = /** @type {HTMLInputElement | null} */ (document.getElementById('plum-bg-dim-range'));
+    const bgDimVal = document.getElementById('plum-bg-dim-val');
+    const bgBlurRange = /** @type {HTMLInputElement | null} */ (document.getElementById('plum-bg-blur-range'));
+    const bgBlurVal = document.getElementById('plum-bg-blur-val');
+
     const fontSelect = /** @type {HTMLSelectElement | null} */ (document.getElementById('plum-font-select'));
     const customWrap = document.getElementById('plum-custom-font-wrap');
     const customInput = /** @type {HTMLInputElement | null} */ (document.getElementById('plum-custom-font-input'));
@@ -135,6 +225,30 @@ function renderSettingsUI() {
     if (customInput) {
         customInput.value = settings.customFont;
     }
+
+    bgSelect?.addEventListener('change', () => {
+        settings.bgPreset = bgSelect.value;
+        applyBackgroundSettings();
+        saveSettingsDebounced();
+    });
+
+    bgDimRange?.addEventListener('input', () => {
+        settings.bgDim = Number(bgDimRange.value);
+        if (bgDimVal) {
+            bgDimVal.textContent = String(settings.bgDim);
+        }
+        applyBackgroundSettings();
+        saveSettingsDebounced();
+    });
+
+    bgBlurRange?.addEventListener('input', () => {
+        settings.bgBlur = Number(bgBlurRange.value);
+        if (bgBlurVal) {
+            bgBlurVal.textContent = String(settings.bgBlur);
+        }
+        applyBackgroundSettings();
+        saveSettingsDebounced();
+    });
 
     fontSelect?.addEventListener('change', () => {
         settings.fontPreset = fontSelect.value;

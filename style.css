@@ -47,6 +47,8 @@
     /* Управляется из настроек расширения (index.js) */
     --theme-font: 'Neucha', sans-serif;
     --theme-font-size: 1.30em;
+    --theme-bg-dim: 0.45;
+    --theme-bg-blur: 0px;
     --mainFontFamily: var(--theme-font);
 }
 
@@ -82,6 +84,25 @@ body,
 #sheld {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+}
+
+/* Слой кастомного фона темы (управляется из index.js) */
+#plum-theme-bg {
+    position: fixed;
+    inset: -24px;
+    z-index: -1;
+    pointer-events: none;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(var(--theme-bg-blur, 0px));
+}
+
+#plum-theme-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(25, 14, 26, var(--theme-bg-dim, 0.45));
 }
 
 /* Аккуратный скроллбар */
