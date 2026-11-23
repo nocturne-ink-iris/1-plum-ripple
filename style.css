@@ -4,6 +4,7 @@
    ========================================================================== */
 
 :root {
+    /* внутри :root {} объявляют глобальные CSS-переменные
     /* --- 1. Твоя палитра --- */
     --plum-base: #673a69;
     --plum-accent: #9a579e;
@@ -12,13 +13,13 @@
     /* Производные тёмные оттенки для читаемого контраста ночью */
     --plum-deep: #211223;
     --plum-surface: #301a33;
-    --plum-user-surface: #3d2140;
     --plum-panel: #29162b;
 
     /* Текст и акценты */
-    --plum-text: #f3eaf2;
-    --plum-text-muted: #c6a9c4;
-    --plum-quote: #f4cbe1;
+    --plum-text: #b57fb3;
+    --plum-text-strong: #f3eaf2;
+    --plum-italics: #a181a0;
+    --plum-quote: #e8bed4;
     --plum-underline: #e3b5db;
     --plum-border: rgba(183, 138, 179, 0.38);
     --plum-border-strong: rgba(183, 138, 179, 0.72);
@@ -30,12 +31,12 @@
 
     /* Переопределяем системные переменные SillyTavern */
     --SmartThemeBodyColor: var(--plum-text);
-    --SmartThemeEmColor: var(--plum-text-muted);
+    --SmartThemeEmColor: var(--plum-italics);
     --SmartThemeQuoteColor: var(--plum-quote);
     --SmartThemeUnderlineColor: var(--plum-underline);
     --SmartThemeBlurTintColor: var(--plum-panel);
     --SmartThemeChatTintColor: rgba(33, 18, 35, 0.88);
-    --SmartThemeUserMesBlurTintColor: var(--plum-user-surface);
+    --SmartThemeUserMesBlurTintColor: var(--plum-surface);
     --SmartThemeBotMesBlurTintColor: var(--plum-surface);
     --SmartThemeBorderColor: var(--plum-border);
     --SmartThemeShadowColor: rgba(14, 6, 16, 0.55);
@@ -94,7 +95,7 @@
    ========================================================================== */
 
 #chat .mes {
-    background: linear-gradient(160deg, var(--plum-surface) 0%, var(--plum-deep) 100%) !important;
+    background: linear-gradient(100deg, var(--plum-surface) 0%, var(--plum-deep) 100%) !important;
     border: 1px solid var(--plum-border) !important;
     /* Тонкая вторая внутренняя каёмка (без размытых теней = ноль лагов) */
     box-shadow: inset 0 0 0 1px rgba(154, 87, 158, 0.18) !important;
@@ -104,11 +105,6 @@
     overflow: visible;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-}
-
-#chat .mes[is_user="true"] {
-    background: linear-gradient(160deg, var(--plum-user-surface) 0%, #2a162c 100%) !important;
-    border-color: rgba(154, 87, 158, 0.5) !important;
 }
 
 /* Липкая контейнер-обёртка аватарки */
@@ -209,13 +205,19 @@ body.hideChatAvatars #chat .mes {
     line-height: 1.62;
 }
 
+/* Жирный текст (в т.ч. для бионического чтения) чуть ярче основного */
+#chat .mes .mes_text strong,
+#chat .mes .mes_text b {
+    color: var(--plum-text-strong);
+}
+
 /* Цитаты и курсив */
 #chat .mes .mes_text q {
     color: var(--plum-quote);
 }
 
 #chat .mes .mes_text em {
-    color: var(--plum-text-muted);
+    color: var(--plum-italics);
 }
 
 /* Кнопки действий у сообщения — делаем аккуратнее */
@@ -251,7 +253,7 @@ body.hideChatAvatars #chat .mes {
 }
 
 #send_textarea::placeholder {
-    color: var(--plum-text-muted) !important;
+    color: var(--plum-italics) !important;
     opacity: 0.65;
 }
 
